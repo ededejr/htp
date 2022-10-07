@@ -9,8 +9,8 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "htp [command]",
-	Short: "a cli tool",
-	Long:  "htp is a cli tool",
+	Short: "http cli utilities",
+	Long:  "htp is a cli tool for making and measuring http requests",
 }
 
 func Execute() {
