@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 )
 
@@ -31,11 +32,12 @@ var stressCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		start := time.Now()
-		results := make(map[int]*measuredResponse)
-		mut := sync.Mutex{}
-
 		done := make(chan bool)
 		canExit := make(chan bool)
+
+		utils := stressCmdUtils{}
+		results := make(map[int]*measuredResponse)
+		mut := sync.Mutex{}
 
 		finish := func() {
 			done <- true
@@ -90,7 +92,7 @@ var stressCmd = &cobra.Command{
 			mut.Unlock()
 
 			if stressCmdFlags.Verbose {
-				fmt.Printf("[w%d|%s] %s - %s\n", wid, time.Now().Format(time.Stamp), m.Res.Status, m.FirstByte.Round(time.Microsecond))
+				utils.formatRequestLog(wid, m.Res.Status, m.FirstByte.Round(time.Microsecond))
 			}
 		}
 
@@ -120,4 +122,38 @@ var stressCmd = &cobra.Command{
 		// program is ready to exit
 		<-canExit
 	},
+}
+
+type stressCmdUtils struct{}
+
+func (s *stressCmdUtils) formatRequestLog(wid int, status string, measuredTime time.Duration) {
+	tagWid := fmt.Sprintf("%d", wid)
+	tagTimestamp := time.Now().Format(time.Stamp)
+	tagStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("darkgrey")).
+		Faint(true)
+	tagStr := tagStyle.Render(fmt.Sprintf("[w%s|%s]", tagWid, tagTimestamp))
+
+	statusColor := "#fefefe"
+	statusCategory := status[0:1]
+
+	if statusCategory == "4" || statusCategory == "5" {
+		statusColor = "#FF0000"
+	} else if statusCategory == "3" {
+		statusColor = "#FFA500"
+	} else if statusCategory == "2" {
+		statusColor = "#00FF00"
+	}
+
+	statusStr := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color(statusColor)).
+		Render(status)
+
+	timeStr := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("#00ffff")).
+		Faint(true).
+		Render(measuredTime.String())
+
+	fmt.Printf("%s %s %s %s\n", tagStr, statusStr, tagStyle.Render("-"), timeStr)
 }
