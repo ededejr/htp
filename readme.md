@@ -9,8 +9,10 @@ Usage:
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
   get         Make a GET request
+  head        Make a HEAD request
   help        Help about any command
   ping        Repeatedly make GET requests
+  stress      Stress test an endpoint with GET requests
   time        Make and time a GET request
 
 Flags:
