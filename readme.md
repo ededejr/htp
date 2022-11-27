@@ -1,5 +1,7 @@
 ### htp
 
+a spiritual successor to [traffika](https://github.com/ededejr/traffika)
+
 ```
 htp is a cli tool for making and measuring http requests
 
