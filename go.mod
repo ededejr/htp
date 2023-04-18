@@ -1,6 +1,6 @@
 module github.com/ededejr/htp
 
-go 1.18
+go 1.20
 
 require (
 	github.com/charmbracelet/lipgloss v0.6.0
